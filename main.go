@@ -44,7 +44,7 @@ func main() {
 		log.Fatalf("w.Close error %s", err)
 	}
 
-	err = ioutil.WriteFile("compressed", []byte(str), 0644)
+	err = ioutil.WriteFile("compressed", w., 0644)
 	check(err)
 
 	fi, err = os.Stat("compressed")
