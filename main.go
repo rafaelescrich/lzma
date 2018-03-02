@@ -3,12 +3,11 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
 
-	"github.com/ulikunitz/xz"
+	"github.com/klauspost/compress/zlib"
 )
 
 func main() {
@@ -26,43 +25,27 @@ func main() {
 	origSize := fi.Size()
 	fmt.Printf("The original file is %d KB long\n", origSize/1000)
 
-	// const text = "The quick brown fox jumps over the lazy dog.\n"
-	var buf bytes.Buffer
-	// compress text
-	w, err := xz.NewWriter(&buf)
-	if err != nil {
-		log.Fatalf("xz.NewWriter error %s", err)
-	}
+	var b bytes.Buffer
 
-	n := bytes.Index(content, []byte{0})
-	s := string(content[:n])
+	w := zlib.NewWriter(&b)
+	w.Write(content)
+	w.Close()
 
-	if _, err := io.WriteString(w, s); err != nil {
-		log.Fatalf("WriteString error %s", err)
-	}
-	if err := w.Close(); err != nil {
-		log.Fatalf("w.Close error %s", err)
-	}
-
-	err = ioutil.WriteFile("compressed", w., 0644)
-	check(err)
-
-	fi, err = os.Stat("compressed")
+	compr := content
+	err = ioutil.WriteFile("compressed", compr, 0644)
 	if err != nil {
 		// Could not obtain stat, handle error
 	}
 
-	comprSize := fi.Size()
+	fmt.Println("content compressed")
+
+	fc, err := os.Stat("compressed")
+	if err != nil {
+		// Could not obtain stat, handle error
+	}
+	comprSize := fc.Size()
 	fmt.Printf("The compressed file is %d KB long\n", comprSize/1000)
 
-	fmt.Printf("Ratio of compression is %d percent\n", comprSize/origSize*100)
+	// TODO: RATIO
 
-	// // decompress buffer and write output to stdout
-	// r, err := xz.NewReader(&buf)
-	// if err != nil {
-	//     log.Fatalf("NewReader error %s", err)
-	// }
-	// if _, err = io.Copy(os.Stdout, r); err != nil {
-	//     log.Fatalf("io.Copy error %s", err)
-	// }
 }
